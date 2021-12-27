@@ -1,0 +1,40 @@
+---
+title: "chap8"
+author: "Satoshi Koiso"
+date: "`r format(Sys.time(), '%m/%d/%Y')`"
+output: 
+  pdf_document:
+    df_print: paged
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+  word_document: default
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Chapter 8
+This is an R Markdown document about Chapter 8 of [this book](https://www.shoeisha.co.jp/book/detail/9784798143446)
+
+
+## 8.3 install arules package
+No output in PDF
+```{r install package, include=FALSE}
+install.packages("arules", repos = "http://cran.us.r-project.org")
+library(arules)
+```
+
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
