@@ -16,25 +16,84 @@ always_allow_html: true
 knitr::opts_chunk$set(echo = TRUE)
 ```
 # Chapter 8
-This is an R Markdown document about Chapter 8 of [this book](https://www.shoeisha.co.jp/book/detail/9784798143446)
+This is an R Markdown document about Chapter 8 of [this book](https://www.shoeisha.co.jp/book/detail/9784798143446).
+
+## Evaluation indicator in association analysis
+
+This is a [great reference](https://www.albert2005.co.jp/knowledge/marketing/customer_product_analysis/abc_association).
+
+### Support
+
+The ratio of transaction including product X and Y to all transactions.
+
+![support](./supp.jpg)
+
+ 
+### Confidence
+
+The ratio of transaction including product X and Y to transaction of X. 
+
+![conficence](./conf.jpg)
+
+This indicator decides the direction of recommendation. 
+
+For example, if X is printer and Y is ink cartridge,
+
+X -> Y : reasonable recommendation
+
+Y -> X : questionable recommendation
 
 
-## 8.3 install arules package
-No output in PDF
+### Lift
+
+The ratio of confidence to the ratio of transaction of Y to all transactions. More than 1 is considered a good recommendation rule.
+
+![lift](./lift.jpg)
+
+## 8.3 Try arules package
+
 ```{r install package, include=FALSE}
 install.packages("arules", repos = "http://cran.us.r-project.org")
 library(arules)
 ```
 
+```{r install dataset, include=FALSE}
+data(Groceries)
+#if you want to read an original file you prepare,
+#Groceries <- read.transaction("Groceries.txt", format="basket", sep=",")
 
-```{r cars}
-summary(cars)
+str(Groceries)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+### summary statistics
+```{r check dataset in first 6 rows}
+inspect(head(Groceries))
 ```
+
+```{r summary statistics}
+summary(Groceries)
+
+```
+
+```{r histogram}
+itemFrequencyPlot(Groceries, support=0.04, cex.names=0.8)# support: set threshold of support, cex.names = adjust the size of labels
+```
+
+### apriori function
+```{r apriori}
+rules <- apriori(Groceries, parameter = list(support = 0.005, confidence = 0.01)) # we can set thresholds
+```
+
+If we want to get associated transactions of beef, we can find products often bought with beef by sorting the data by `lift`.
+```{r beef}
+beefRules <- subset(rules,subset= rhs %in% "beef")
+inspect(head(sort(beefRules,by= "lift")))
+
+```
+However, based on support, the 3rd combination--{root veg} -> {beef}-- might be more insightful.
+
+
+```{r save csv file}
+write(beefRules, file="data.csv", sep=",", col.names=NA)
+```
+
