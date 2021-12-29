@@ -3,9 +3,6 @@ title: "chap8"
 author: "Satoshi Koiso"
 date: "`r format(Sys.time(), '%m/%d/%Y')`"
 output: 
-  pdf_document:
-    df_print: paged
-    latex_engine: xelatex
   html_document:
     df_print: paged
   word_document: default
@@ -65,7 +62,7 @@ data(Groceries)
 str(Groceries)
 ```
 
-### summary statistics
+### Summary Statistics
 ```{r check dataset in first 6 rows}
 inspect(head(Groceries))
 ```
@@ -79,7 +76,7 @@ summary(Groceries)
 itemFrequencyPlot(Groceries, support=0.04, cex.names=0.8)# support: set threshold of support, cex.names = adjust the size of labels
 ```
 
-### apriori function
+### Apriori function
 ```{r apriori}
 rules <- apriori(Groceries, parameter = list(support = 0.005, confidence = 0.01)) # we can set thresholds
 ```
@@ -96,4 +93,46 @@ However, based on support, the 3rd combination--{root veg} -> {beef}-- might be 
 ```{r save csv file}
 write(beefRules, file="data.csv", sep=",", col.names=NA)
 ```
+
+## 8.3 Visualize results
+```{r install two packages, include=FALSE}
+#install.packages("arules", repos = "http://cran.us.r-project.org")     
+install.packages("arulesViz", repos = "http://cran.us.r-project.org")
+#library(arules)                 
+library(arulesViz)
+```
+
+```{r run algorithum}
+#data(Groceries)
+rules <- apriori(Groceries, parameter=list(support=0.001, confidence=0.5)) # lower thresholds than the above
+```
+
+### Scatterplot
+```{r plot rule}
+plot(rules)
+```
+
+
+
+### Bubble chart
+```{r bubble chart, fig.height = 10, fig.width = 10}
+plot(rules, method="grouped", control=list(k=30))
+```
+
+size of bubbles: support
+color of bubbles: lift
+
+### Association graph
+```{r directed graph}
+rules_high_lift <- head(sort(rules, by="lift"), 10) # limit the top 10
+plot(rules_high_lift, method="graph",  engine='interactive')
+```
+
+The output does not appear in html. Try this chunk on Rstudio.
+
+### Write DOT and GraphML files
+```{r output}
+saveAsGraph(rules_high_lift, file="rules.graphml", format="graphml")
+```
+The files can be manipulated with GraphViz, Gephi, and CytoScape.
 
