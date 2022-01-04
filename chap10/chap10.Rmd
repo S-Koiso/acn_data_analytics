@@ -1,0 +1,149 @@
+---
+title: "chap8"
+author: "Satoshi Koiso"
+date: "`r format(Sys.time(), '%m/%d/%Y')`"
+output: 
+  html_document:
+    df_print: paged
+  word_document: default
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Chapter 10
+This is an R Markdown document about Chapter 10 of [this book](https://www.shoeisha.co.jp/book/detail/9784798143446).
+
+## Clustering analysis
+
+- Hierarchical Clustering
+- Non-Hierarchical Clustering
+
+## 10.1 Data collection and processing
+
+```{r install dataset and scaling}
+data.orig <- read.csv("http://enterprisezine.jp/static/images/article/6873/flat35_research_2013.csv", header=TRUE, row.names="都道府県", fileEncoding="UTF-8")
+
+head(data.orig)
+
+# scaling to make the average as 0 and std as 1
+data.scale <- scale(data.orig)
+
+```
+
+
+data.dist <- dist(data.scale, method="euclidean")
+
+# ???????ꂽ?s???{???f?[?^?̋????s?????m?F
+data.dist
+
+# ?E?H?[?h?@?ɂ????K?w?I?N???X?^?[????
+ward.hclust <- hclust(data.dist, method="ward.D2")
+
+# ?K?w?I?N???X?^?[???͂̌??ʂ??f???h???O?????ŕ\??
+plot(ward.hclust, hang=-1)
+
+# ?t?H???g?t?@?~???[?̎w?????iMac OS X ?̏ꍇ?j
+par(family = "HiraKakuProN-W3")
+
+# ?K?w?I?N???X?^?[???͂̌??ʂ??c?��т̃f???h???O?????ŕ\??
+plot(as.dendrogram(ward.hclust), horiz=TRUE, main="Hierarchical Clustering Dendrogram (Ward)")
+
+# ?f?[?^?��??ʂ̃q?[?g?}?b?v???\??
+heatmap(data.scale, Rowv=as.dendrogram(ward.hclust), Colv=NA, scale="none", main="Heat Map for Hierarchical Clustering (Ward)")
+
+# 2?`4?̃N???X?^?[?ɕ???
+ward.cutree <- cutree(ward.hclust, k=2:4)
+
+# cutree?̕??????ʂ??\??
+ward.cutree
+
+# ?E?H?[?h?@?ɂ????K?w?I?N???X?^?[???͂̌??ʂ??f???h???O?????ōĕ\??
+plot(ward.hclust, hang=-1)
+
+# ?Ԙg?ŃN???X?^?[????3?̏ꍇ?̕??????ʂ����?
+rect.hclust(ward.hclust, k=3, border="red")
+
+
+```{r install package, include=FALSE}
+install.packages("arules", repos = "http://cran.us.r-project.org")
+library(arules)
+```
+
+
+
+### Summary Statistics
+```{r check dataset in first 6 rows}
+inspect(head(Groceries))
+```
+
+```{r summary statistics}
+summary(Groceries)
+
+```
+
+```{r histogram}
+itemFrequencyPlot(Groceries, support=0.04, cex.names=0.8)# support: set threshold of support, cex.names = adjust the size of labels
+```
+
+### Apriori function
+```{r apriori}
+rules <- apriori(Groceries, parameter = list(support = 0.005, confidence = 0.01)) # we can set thresholds
+```
+
+If we want to get associated transactions of beef, we can find products often bought with beef by sorting the data by `lift`.
+```{r beef}
+beefRules <- subset(rules,subset= rhs %in% "beef")
+inspect(head(sort(beefRules,by= "lift")))
+
+```
+However, based on support, the 3rd combination--{root veg} -> {beef}-- might be more insightful.
+
+
+```{r save csv file}
+write(beefRules, file="data.csv", sep=",", col.names=NA)
+```
+
+## 8.3 Visualize results
+```{r install two packages, include=FALSE}
+#install.packages("arules", repos = "http://cran.us.r-project.org")     
+install.packages("arulesViz", repos = "http://cran.us.r-project.org")
+#library(arules)                 
+library(arulesViz)
+```
+
+```{r run algorithum}
+#data(Groceries)
+rules <- apriori(Groceries, parameter=list(support=0.001, confidence=0.5)) # lower thresholds than the above
+```
+
+### Scatterplot
+```{r plot rule}
+plot(rules)
+```
+
+
+
+### Bubble chart
+```{r bubble chart, fig.height = 10, fig.width = 10}
+plot(rules, method="grouped", control=list(k=30))
+```
+
+size of bubbles: support
+color of bubbles: lift
+
+### Association graph
+```{r directed graph}
+rules_high_lift <- head(sort(rules, by="lift"), 10) # limit the top 10
+plot(rules_high_lift, method="graph",  engine='interactive')
+```
+
+The output does not appear in html. Try this chunk on Rstudio.
+
+### Write DOT and GraphML files
+```{r output}
+saveAsGraph(rules_high_lift, file="rules.graphml", format="graphml")
+```
+The files can be manipulated with GraphViz, Gephi, and CytoScape.
+
