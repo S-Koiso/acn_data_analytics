@@ -33,38 +33,83 @@ data.scale <- scale(data.orig)
 ```
 
 
-data.dist <- dist(data.scale, method="euclidean")
+## 10.2 Hierarchical Clustering
 
-# ???????ꂽ?s???{???f?[?^?̋????s?????m?F
+The Ward method: calculating the euclidean distances.
+```{r ward}
+data.dist <- dist(data.scale, method = "euclidean")
 data.dist
 
-# ?E?H?[?h?@?ɂ????K?w?I?N???X?^?[????
-ward.hclust <- hclust(data.dist, method="ward.D2")
+# clustering
+ward.hclust <- hclust(data.dist, method = "ward.D2")
 
-# ?K?w?I?N???X?^?[???͂̌??ʂ??f???h???O?????ŕ\??
-plot(ward.hclust, hang=-1)
+# If you dont know which argument to choose,
+?hclust
+```
 
-# ?t?H???g?t?@?~???[?̎w?????iMac OS X ?̏ꍇ?j
-par(family = "HiraKakuProN-W3")
+Visualizing the result
 
-# ?K?w?I?N???X?^?[???͂̌??ʂ??c?��т̃f???h???O?????ŕ\??
-plot(as.dendrogram(ward.hclust), horiz=TRUE, main="Hierarchical Clustering Dendrogram (Ward)")
+```{r ward visual}
+# visualize the dendrogram
+plot(ward.hclust, hang = -1) # hang: to align the labels
 
-# ?f?[?^?��??ʂ̃q?[?g?}?b?v???\??
-heatmap(data.scale, Rowv=as.dendrogram(ward.hclust), Colv=NA, scale="none", main="Heat Map for Hierarchical Clustering (Ward)")
+# flip the dendrogram 90 degree
+plot(as.dendrogram(ward.hclust), horiz = T, main = "Hierarchical Clustering Dendrogram (Ward)")
 
-# 2?`4?̃N???X?^?[?ɕ???
+```
+
+Decide the number of clusters.
+
+Capture the characteristics of each cluster by visualizing the data.
+```{r heatmap}
+# heatmap
+heatmap(data.scale, Rowv = as.dendrogram(ward.hclust), Colv = NA, scale = "none", main = "Heat Map for Hierarcical Clustering (Ward)")
+
+#category by # of cluster
 ward.cutree <- cutree(ward.hclust, k=2:4)
-
-# cutree?̕??????ʂ??\??
 ward.cutree
+```
 
-# ?E?H?[?h?@?ɂ????K?w?I?N???X?^?[???͂̌??ʂ??f???h???O?????ōĕ\??
-plot(ward.hclust, hang=-1)
+- 2 clusters: 
+  - 1: 
+    - Household size: L
+    - Household income: H
+    - House size: L
+    - Asset amount: H
+  - 2: 
+    - Household size: H
+    - Household income: L
+    - House size: H
+    - Asset amount: L
+- 3 clusters: 
+  - 1: 
+    - Age: H
+    - Household size: L
+    - Household income: H
+    - House size: L
+    - Asset amount: H
+  - 2: 
+    - Age: H
+    - Household size: H
+    - Household income: L
+    - House size: H
+    - Asset amount: L
+  - 3: 
+    - Age: L
+    - Household size: H
+    - Household income: L
+    - House size: H
+    - Asset amount: L
+- 4 clusters: Besides 3 clusters, Tokyo is separated. 
 
-# ?Ԙg?ŃN???X?^?[????3?̏ꍇ?̕??????ʂ����?
-rect.hclust(ward.hclust, k=3, border="red")
 
+Show boundaries
+```{r plot with boundaries}
+plot(ward.hclust, hang = -1)
+rect.hclust(ward.hclust, k=3, border = "red")
+```
+
+## 10.3 Non-Hierarchical Clustering
 
 ```{r install package, include=FALSE}
 install.packages("arules", repos = "http://cran.us.r-project.org")
