@@ -1,5 +1,5 @@
 ---
-title: "Chapter 10 Clustering Analysis"
+title: "Chapter 10 Cluster Analysis"
 author: "Satoshi Koiso"
 date: "`r format(Sys.time(), '%m/%d/%Y')`"
 output: 
@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This is an R Markdown document about Chapter 10 of [this book](https://www.shoeisha.co.jp/book/detail/9784798143446).
 
-Clustering analysis is divided into two categories:
+Cluster analysis is divided into two categories:
 
 - Hierarchical Clustering
 - Non-Hierarchical Clustering
@@ -164,7 +164,7 @@ km.best.nc$Best.nc
 
 2 is the best number of clusters.
 
-### K-Means Clustering Analysis
+### K-Means Clustering
 ```{r k-means}
 km <- kmeans(data.scale, centers = 2, nstart = 10)
 km
