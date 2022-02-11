@@ -1,10 +1,11 @@
 ---
-title: "chap8"
+title: "Chapter 8 Association Analysis"
 author: "Satoshi Koiso"
 date: "`r format(Sys.time(), '%m/%d/%Y')`"
 output: 
   html_document:
-    df_print: paged
+    toc: true
+    toc_float: true
   word_document: default
 always_allow_html: true
 ---
@@ -12,42 +13,42 @@ always_allow_html: true
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-# Chapter 8
+
 This is an R Markdown document about Chapter 8 of [this book](https://www.shoeisha.co.jp/book/detail/9784798143446).
 
-## Evaluation indicator in association analysis
+## 8.2 Evaluation Indicators in Association Analysis
 
-This is a [great reference](https://www.albert2005.co.jp/knowledge/marketing/customer_product_analysis/abc_association).
+This blog is a [great reference](https://www.albert2005.co.jp/knowledge/marketing/customer_product_analysis/abc_association).
 
 ### Support
 
 The ratio of transaction including product X and Y to all transactions.
 
-![support](./supp.jpg)
+![](./supp.jpg)
 
  
 ### Confidence
 
 The ratio of transaction including product X and Y to transaction of X. 
 
-![conficence](./conf.jpg)
+![](./conf.jpg)
 
 This indicator decides the direction of recommendation. 
 
 For example, if X is printer and Y is ink cartridge,
 
-X -> Y : reasonable recommendation
+X -> Y : Reasonable recommendation. 
 
-Y -> X : questionable recommendation
+Y -> X : Questionable recommendation.
 
 
 ### Lift
 
 The ratio of confidence to the ratio of transaction of Y to all transactions. More than 1 is considered a good recommendation rule.
 
-![lift](./lift.jpg)
+![](./lift.jpg)
 
-## 8.3 Try arules package
+## 8.3 `arules` package
 
 ```{r install package, include=FALSE}
 install.packages("arules", repos = "http://cran.us.r-project.org")
@@ -76,7 +77,7 @@ summary(Groceries)
 itemFrequencyPlot(Groceries, support=0.04, cex.names=0.8)# support: set threshold of support, cex.names = adjust the size of labels
 ```
 
-### Apriori function
+### Apriori Function
 ```{r apriori}
 rules <- apriori(Groceries, parameter = list(support = 0.005, confidence = 0.01)) # we can set thresholds
 ```
@@ -94,7 +95,7 @@ However, based on support, the 3rd combination--{root veg} -> {beef}-- might be 
 write(beefRules, file="data.csv", sep=",", col.names=NA)
 ```
 
-## 8.3 Visualize results
+## 8.3 Visualization
 ```{r install two packages, include=FALSE}
 #install.packages("arules", repos = "http://cran.us.r-project.org")     
 install.packages("arulesViz", repos = "http://cran.us.r-project.org")
@@ -114,7 +115,7 @@ plot(rules)
 
 
 
-### Bubble chart
+### Bubble Chart
 ```{r bubble chart, fig.height = 10, fig.width = 10}
 plot(rules, method="grouped", control=list(k=30))
 ```
@@ -122,7 +123,7 @@ plot(rules, method="grouped", control=list(k=30))
 size of bubbles: support
 color of bubbles: lift
 
-### Association graph
+### Association Graph
 ```{r directed graph}
 rules_high_lift <- head(sort(rules, by="lift"), 10) # limit the top 10
 plot(rules_high_lift, method="graph",  engine='interactive')
@@ -130,7 +131,7 @@ plot(rules_high_lift, method="graph",  engine='interactive')
 
 The output does not appear in html. Try this chunk on Rstudio.
 
-### Write DOT and GraphML files
+### DOT and GraphML Files
 ```{r output}
 saveAsGraph(rules_high_lift, file="rules.graphml", format="graphml")
 ```

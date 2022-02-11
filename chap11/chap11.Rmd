@@ -1,5 +1,5 @@
 ---
-title: "Chapter 10 Clustering Analysis"
+title: "Chapter 11 Decision Tree"
 author: "Satoshi Koiso"
 date: "`r format(Sys.time(), '%m/%d/%Y')`"
 output: 
@@ -14,7 +14,11 @@ always_allow_html: true
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-This is an R Markdown document about Chapter 10 of [this book](https://www.shoeisha.co.jp/book/detail/9784798143446).
+This is an R Markdown document about Chapter 11 of [this book](https://www.shoeisha.co.jp/book/detail/9784798143446).
+
+
+
+
 
 Clustering analysis is divided into two categories:
 
