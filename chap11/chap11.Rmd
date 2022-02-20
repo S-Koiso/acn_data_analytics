@@ -17,26 +17,33 @@ knitr::opts_chunk$set(echo = TRUE)
 This is an R Markdown document about Chapter 11 of [this book](https://www.shoeisha.co.jp/book/detail/9784798143446).
 
 
+## 11.4 Constructing Decision Tree
 
+```{r install packages, include=F}
+install.packages("rpart", repos = "http://cran.us.r-project.org")
+install.packages("rpart.plot", repos = "http://cran.us.r-project.org")
 
-
-Clustering analysis is divided into two categories:
-
-- Hierarchical Clustering
-- Non-Hierarchical Clustering
-
-## 10.1 Data Collection and Processing
-
-```{r install dataset and scaling}
-data.orig <- read.csv("http://enterprisezine.jp/static/images/article/6873/flat35_research_2013.csv", header=TRUE, row.names="都道府県", fileEncoding="UTF-8")
-
-head(data.orig)
-
-# scaling to make the average as 0 and std as 1
-data.scale <- scale(data.orig)
-
+library(rpart)
+library(rpart.plot)
 ```
 
+
+```{r install data}
+TitanicData <- data.frame(Titanic)
+TitanicData
+```
+
+Decision Tree Analysis
+
+```{r}
+titanic.rp <- rpart(Survived~Class + Sex + Age, weights = Freq, data = TitanicData, control = rpart.control(minsplit = 1))
+
+#result
+titanic.rp
+
+# plot
+prp(titanic.rp, type = 4, extra = 1)
+```
 
 ## 10.2 Hierarchical Clustering
 
@@ -125,8 +132,6 @@ K-Means clustering is one main example of non-hierarchical clustering.
 We need to choose the number of clusters **before** conducting the K-Means method.
 
 ```{r install package, include=FALSE}
-install.packages("NbClust", repos = "http://cran.us.r-project.org")
-library(NbClust)
 ```
 
 ```{r Evaluation the number of clusters}
