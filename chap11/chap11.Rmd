@@ -45,6 +45,31 @@ titanic.rp
 prp(titanic.rp, type = 4, extra = 1)
 ```
 
+## 11.6 Weakness 1: Overfitting
+
+```{r install kernlab package, include=F}
+install.packages("kernlab", repos = "http://cran.us.r-project.org")
+library(kernlab)
+```
+
+```{r install income data}
+data(income)
+head(income)
+```
+
+```{r}
+income.rp <- rpart(HOUSEHOLDER~INCOME + SEX + EDUCATION + AREA + UNDER18, data = income, control = rpart.control(cp = 0.001)) #cp: Complexity parameter - 0 means no branch cutting = too complicated
+
+# plot
+prp(income.rp, type = 4, extra = 1)
+```
+
+
+```{r}
+plotcp(income.rp)
+
+```
+
 ## 10.2 Hierarchical Clustering
 
 ### The Ward Method
