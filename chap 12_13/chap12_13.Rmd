@@ -1,5 +1,5 @@
 ---
-title: "Chapter 11 Decision Tree"
+title: "Chapter 12 and 13 Path Searching"
 author: "Satoshi Koiso"
 date: "`r format(Sys.time(), '%m/%d/%Y')`"
 output: 
@@ -14,17 +14,18 @@ always_allow_html: true
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-This is an R Markdown document about Chapter 11 of [this book](https://www.shoeisha.co.jp/book/detail/9784798143446).
+This is an R Markdown document about Chapter 12 & 13 of [this book](https://www.shoeisha.co.jp/book/detail/9784798143446).
 
 
-## 11.4 Constructing Decision Tree
+## 13.2 Path Searching in R
 
+### osmar package
 ```{r install packages, include=F}
-install.packages("rpart", repos = "http://cran.us.r-project.org")
-install.packages("rpart.plot", repos = "http://cran.us.r-project.org")
+#install.packages("osmar", repos = "http://cran.us.r-project.org")
+#install.packages("igraph", repos = "http://cran.us.r-project.org")
 
-library(rpart)
-library(rpart.plot)
+library(osmar)
+library(igraph)
 ```
 
 
