@@ -9,4 +9,5 @@ As of 2022, some codes in the book are already outdated.
 |10    | Cluster Analysis|NbClust|
 |11    | Decision Tree |rpart, rpart.plot, kernlab
 |12 & 13 | Path Search | osmar, igraph | 
+|14    | Collaborative Filtering | recommender lab |
 |16    | Deep Learning with H2O | h2o |
