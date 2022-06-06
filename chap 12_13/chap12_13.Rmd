@@ -11,6 +11,17 @@ always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
+if (TRUE) {
+  list.of.packages <- c("tidyverse", "haven", "here", "kableExtra","rstudioapi","DescTools","qwraps2","data.table","stargazer","readxl","dplyr","rootSolve","ggdag","SuperLearner","Metrics","ggplot2","readr","nnet","sandwich","lmtest","broom","sandwich","lmtest","assertr",'lavaan','semPlot',"makedummies","dagitty","gridExtra","patchwork")
+  new.packages <- list.of.packages[
+    !( list.of.packages %in% installed.packages()[,"Package"] )
+    ]
+  if(length(new.packages)) install.packages(new.packages,
+                                            repos = "https://cloud.r-project.org")
+
+  lapply(list.of.packages, library, character.only = TRUE)
+}
+setwd(dirname(getActiveDocumentContext()$path)) 
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -23,15 +34,26 @@ This is an R Markdown document about Chapter 12 & 13 of [this book](https://www.
 ```{r install packages, include=F}
 #install.packages("osmar", repos = "http://cran.us.r-project.org")
 #install.packages("igraph", repos = "http://cran.us.r-project.org")
+#install.packages("OpenStreetMap", repos = "http://cran.us.r-project.org")
+# install.packages("osmdata")
 
 library(osmar)
 library(igraph)
+library(osmdata)
 ```
 
 
+### Import Map data
 ```{r install data}
-TitanicData <- data.frame(Titanic)
-TitanicData
+# src <- osmsource_osmosis(file = "map.osm")
+# cb <- center_bbox(139.7069, 35.6671, 500, 500) # long, lat, north&south (m), west&east(m)
+# map <- get_osm(cb,source = osmsource_api(url = "https://api.openstreetmap.org/api/0.6/"))#error
+
+q <- opq(bbox = c(139.7006, 35.6612, 139.7195, 35.6719))
+map <- osmdata_xml(q, 'map.osm')
+map <- osmdata_sf(q)
+
+plot(map)
 ```
 
 Decision Tree Analysis

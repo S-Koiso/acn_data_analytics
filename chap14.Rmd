@@ -1,0 +1,198 @@
+---
+title: "Chapter 14 Collaborative Filtering"
+author: "Satoshi Koiso"
+date: "`r format(Sys.time(), '%m/%d/%Y')`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+  word_document: default
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+if (TRUE) {
+  list.of.packages <- c("tidyverse", "haven", "here", "kableExtra","rstudioapi","DescTools","qwraps2","data.table","stargazer","readxl","dplyr","rootSolve","ggdag","SuperLearner","Metrics","ggplot2","readr","nnet","sandwich","lmtest","broom","sandwich","lmtest","assertr",'lavaan','semPlot',"makedummies","dagitty","gridExtra","patchwork")
+  new.packages <- list.of.packages[
+    !( list.of.packages %in% installed.packages()[,"Package"] )
+    ]
+  if(length(new.packages)) install.packages(new.packages,
+                                            repos = "https://cloud.r-project.org")
+
+  lapply(list.of.packages, library, character.only = TRUE)
+}
+setwd(dirname(getActiveDocumentContext()$path)) 
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is an R Markdown document about Chapter 14 of [this book](https://www.shoeisha.co.jp/book/detail/9784798143446).
+
+
+## 14.2 Algorithums
+
+### Three Types of Algorithums
+
+| Category  | Overview | Methods |
+|-----------|----------|---------|
+| Memory-based | Based on the similarities between users/items | User-based, Item-based |
+| Model-based | Based on classification models with learning data, identify the patterns of purchase activities | Bayesian Network, Clustering, and Regression models |
+| Hybrid    | Between Memory-based and Model-based | - |
+
+
+## 14.4 Recommenderlab
+
+### Datatype
+
+- realRatingMatrix: Numeric and non-binary rating
+- binaryRatingMatrix: binary rating (0 or 1)
+
+```{r install packages, include=F}
+install.packages("recommenderlab", repos = "http://cran.us.r-project.org")
+
+library(recommenderlab)
+```
+
+
+```{r install data}
+data("MovieLense")
+MovieLense
+```
+
+
+```{r }
+# convert into dataframe
+head(as(MovieLense, "data.frame"))
+
+# convert into matrix
+as(MovieLense, "matrix")[501:505, 1:5]
+```
+
+### Visualize rating
+
+```{r}
+image(MovieLense, main="Raw Ratings")
+```
+
+### Descriptive Statistics
+
+```{r}
+# Number of Rating by user
+rowCounts(MovieLense)
+summary(rowCounts(MovieLense))
+
+# Ave. Rating Score by user
+rowMeans(MovieLense)
+summary(rowMeans(MovieLense))
+hist(rowMeans(MovieLense))
+```
+
+We could say that there are biases among the users. Some tend to rate higher than others do. It is common to normalize the data in advance using `recommenderlab::normalize`
+- center: Subtract the average rate of the user from non-NA rate
+- Z-score: Divide the result of the above center by the standard deviation of the user
+
+```{r}
+rowMeans(normalize(MovieLense, method = "center"))
+summary(rowMeans(normalize(MovieLense, method = "center")))
+```
+
+### Apply Algorithms
+
+Algorithms in `recommenderlab``
+
+| Algorithm  | Overview | realRatingMatrix | binaryRatingMatrix |
+|-----------|----------|---------|---------|
+| RANDOM | Choose items at random and recommend them | Yes | Yes |
+| POPULAR| Recommend popular items based on the number of buyers | Yes | Yes |
+| UBCF | User-Based Collaborative Filtering | Yes | Yes |
+| IBCF | Item-Based Collaborative Filtering | Yes | Yes |
+| PCA  | Principal Component Analysis | Yes | No |
+| SVD  | Singular Value Decomposition (for demention reduction) | Yes | No |
+| AR   | Recommend items based on association rule | No | Yes |
+
+
+```{r}
+# summary 
+# recommenderRegistry$get_entries(dataType='realRatingMatrix')
+# recommenderRegistry$get_entries(dataType='binaryRatingMatrix')
+```
+
+
+## Create Recommender
+
+Let's do UBCF (User-Based Collaborative Filtering).
+1. Create recommender based on trainging data
+2. Predict recommendation: Create Top-N list and predict rading
+
+### 1. Create Recommender
+
+Use `Recommender`function. the 1st arg is training data of rating matrix and 2nd arg is method.
+
+```{r}
+# with the first 500 data
+r <- Recommender(MovieLense[1:500], method ="UBCF")
+
+```
+
+### 2. Predict Recommendation
+
+Use `predict` function. Do recommendation.
+
+```{r}
+# predict rating of #501-505 users
+p <- predict(r, MovieLense[501:505], type = "ratings")
+
+# display the predicted ratings of the first 5 movies
+as(p, "matrix")[1:5,1:5]
+
+```
+
+
+For the movies the users already rated, **NA** is shown.
+
+
+## Evaluate the algorithms
+
+With RMSE, evaluate the algorithms
+1. Create the evaluation criteria
+2. Evaluate
+
+### 1. Create the evaluation criteria
+
+```{r}
+# Split method
+e <- evaluationScheme(MovieLense, method = "split", train = 0.9, given = 15)
+
+# set 90% of data as training and 10% as test
+# 15 items in the test data for prediction and the other for prediction error calculation
+
+```
+
+### 2. Evaluate
+
+```{r}
+# UBCF recommender with training data
+r.ubcf <- Recommender(getData(e, "train"), method = "UBCF")
+# IBCF recommender with training data
+r.ibcf <- Recommender(getData(e, "train"), method = "IBCF")
+
+# Predict with test data and UBCF recommender
+p.ubcf <- predict(r.ubcf, getData(e, "known"), type = "ratings")
+# Predict with test data and IBCF recommender
+p.ibcf <- predict(r.ibcf, getData(e, "known"), type = "ratings")
+```
+
+Calculate accuracies of UBCF and IBCF
+
+```{r}
+e <- rbind(calcPredictionAccuracy(p.ubcf, getData(e,"unknown")),
+           calcPredictionAccuracy(p.ibcf, getData(e,"unknown")))
+rownames(e) <- c("UBCF","IBCF")
+e
+```
+
+IBCF has higher accuracy.
+
+```{r}
+help(package="recommenderlab")
+```
+
