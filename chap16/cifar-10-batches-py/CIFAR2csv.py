@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # convert CIFAR-10 dataset into CSV
 import numpy as np
-import pickle as cPickle
+import pickle  as cPickle
 import glob2 as glob
 
 # define function
